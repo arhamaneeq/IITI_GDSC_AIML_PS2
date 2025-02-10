@@ -45,6 +45,6 @@ def transcribe_audio(audio_bytes):
     audio_array = convert_bytes_to_array(audio_bytes)
 
     prediction = pipe(audio_array, batch_size=1)["text"]
-    print(prediction)
+    #print(prediction)
     
     return prediction

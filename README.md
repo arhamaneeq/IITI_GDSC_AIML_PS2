@@ -6,3 +6,7 @@ Create an intelligent chatbot that integrates Retrieval-Augmented Generation (RA
 - *Retrieval Augmented Generation:* Integrate a search or retrieval model that pulls in relvant documents or data from a knowledge base and then uses a language model to generate human like-responses.
 - *Voice Interface:* Implement speech-to-text and text-to-speech for voice interaction, allowing the user to speak to the chatbot and get audio responses.
 - *Deployment:* Deploy the chatbot on a website.
+
+### Requirements
+ffmpeg / requires choco
+llama-cpp-python / requires a lot of bs
