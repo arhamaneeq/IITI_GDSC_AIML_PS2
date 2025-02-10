@@ -1,7 +1,7 @@
 import streamlit as st
 
 from llms_chain import load_normal_chain
-from utils import save_chat_history_json
+from utils import save_chat_history_json, get_timestamp, load_chat_history_json
 
 from langchain.memory import StreamlitChatMessageHistory
 
@@ -22,9 +22,16 @@ def set_send_input():
     st.session_state.send_input = True
     clear_input_field()
 
+def track_index():
+    st.session_state.session_tracker = st.session_state.session_key
+
 def save_chat_history():
     if st.session_state.history != []:
-        save_chat_history_json(st.session_state.history, config["chat_history_path"] + "random" + ".json")
+        if st.session_state.session_key == "new_session":
+            st.session_state.new_session_key = get_timestamp() + ".json"
+            save_chat_history_json(st.session_state.history, config["chat_history_path"] + st.session_state.new_session_key)
+        else:
+            save_chat_history_json(st.session_state.history, config["chat_history_path"] + st.session_state.session_key)
 
 def main():
     st.title("Raggy!")
@@ -34,10 +41,23 @@ def main():
     chat_sessions = ["new_session"] + os.listdir(config["chat_history_path"])
 
     if "send_input" not in st.session_state:
+        st.session_state.session_key = "new_session"
         st.session_state.send_input = False
         st.session_state.user_question = ""
+        st.session_state.new_session_key = None
+        st.session_state.session_index_tracker = "new_session"
+    if st.session_state.session_key == "new_session" and st.session_state.new_session_key != None:
+        st.session_state.session_index_tracker = st.session_state.new_session_key
+        st.session_state.new_session_key = None
 
-    st.sidebar.selectbox("Select a Chat Session", chat_sessions, key="session_key")
+
+    index = chat_sessions.index(st.session_state.session_index_tracker)
+    st.sidebar.selectbox("Select a Chat Session", chat_sessions, key="session_key", on_change=track_index)
+
+    if st.session_state.session_key != "new_session":
+        st.session_state.history = load_chat_history_json(config["chat_history_path"] + st.session_state.session_key)
+    else:
+        st.session_state.history = []
 
     chat_history = StreamlitChatMessageHistory(key="history")
     llm_chain = load_chain(chat_history)
