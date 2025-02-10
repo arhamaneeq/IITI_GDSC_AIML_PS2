@@ -4,7 +4,7 @@ import streamlit as st
 from streamlit_mic_recorder import mic_recorder
 
 # my util files
-from llms_chain import load_normal_chain
+from llms_chain import load_normal_chain, load_pdf_chat_chain
 from utils import save_chat_history_json, get_timestamp, load_chat_history_json
 from audio_handler import transcribe_audio
 from image_handler import handle_image
@@ -17,6 +17,10 @@ from langchain.memory import StreamlitChatMessageHistory
 import os
 import yaml
 
+# import gtts
+from gtts import gTTS
+import tempfile
+
 # READ CONFIG FILE
 
 with open("config.yaml", "r") as f:
@@ -25,6 +29,8 @@ with open("config.yaml", "r") as f:
 # EXTRACT OUT SOME STUFF
 
 def load_chain(chat_history):
+    if st.session_state.pdf_chat:
+        return load_pdf_chat_chain(chat_history)
     return load_normal_chain(chat_history)
 
 def clear_input_field():
@@ -37,6 +43,9 @@ def set_send_input():
 
 def track_index():
     st.session_state.session_tracker = st.session_state.session_key
+
+def toggle_pdf_chat():
+    st.session_state.pdf_chat = True
 
 def save_chat_history():
     if st.session_state.history != []:
@@ -74,10 +83,12 @@ def main():
     # Selectbox Behaviour for Loading Previous Conversations    
     index = chat_sessions.index(st.session_state.session_index_tracker)
     st.sidebar.selectbox("Select a Chat Session", chat_sessions, key="session_key", on_change=track_index)
+
+    st.sidebar.toggle("PDF Chat", key="pdf_chat", value=False)
     # Image Upload
     uploaded_image = st.sidebar.file_uploader("Upload an image file: ", type=["jpg", "jpeg", "png"])
     # PDF Upload
-    uploaded_pdf = st.sidebar.file_uploader("Upload a PDF file", accept_multiple_files=True, key="pdf_upload", type=["pdf"])
+    uploaded_pdf = st.sidebar.file_uploader("Upload a PDF file", accept_multiple_files=True, key="pdf_upload", type=["pdf"], on_change=toggle_pdf_chat)
 
 
     if st.session_state.session_key != "new_session":
@@ -107,7 +118,11 @@ def main():
     if (voice_recording):
         transcribed_audio = transcribe_audio(voice_recording["bytes"])
         #print(transcribed_audio)
-        llm_chain.run(transcribed_audio)
+        llm_response = llm_chain.run(transcribed_audio, audio=True)
+        tts = gTTS(text=llm_response, lang='en', tld='com.au')
+        with tempfile.NamedTemporaryFile(delete=False) as fp:
+            tts.save(fp.name)
+            st.audio(fp.name, format='audio/mp3', start_time=0, autoplay=True)
 
     if (send_button or st.session_state.send_input):
         if (uploaded_image):
