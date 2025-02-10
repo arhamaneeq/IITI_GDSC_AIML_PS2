@@ -1,10 +1,16 @@
+# streamlit stuff
 import streamlit as st
+from streamlit_mic_recorder import mic_recorder
 
+# my util files
 from llms_chain import load_normal_chain
 from utils import save_chat_history_json, get_timestamp, load_chat_history_json
+from audio_handler import transcribe_audio
 
+# langchain stuff
 from langchain.memory import StreamlitChatMessageHistory
 
+# file handling stuff
 import os
 import yaml
 
@@ -64,15 +70,25 @@ def main():
 
     user_input = st.text_input("Ask Raggy anything!", key="user_input", on_change=set_send_input)
 
-    send_button = st.button("Send", key="send_button")
+    voice_col, send_col = st.columns(2)
+
+    with voice_col:
+        voice_recording = mic_recorder(start_prompt="Start Recording", stop_prompt="Stop Recording")
+    with send_col:
+        send_button = st.button("Send", key="send_button", on_click=clear_input_field)
+
+
+    print(voice_recording)
+    if voice_recording:
+        transcribed_audio = transcribe_audio(voice_recording["bytes"])
+        print(transcribed_audio)
+        llm_chain.run(transcribed_audio)
 
     if (send_button or st.session_state.send_input):
         if (st.session_state.user_question != ""):
-            with chat_container:
-                # st.chat_message("user").write(st.session_state.user_question)
-                llm_response = llm_chain.run(st.session_state.user_question)
-                # st.chat_message("ai").write(llm_response)
-                st.session_state.user_question = ""
+            llm_response = llm_chain.run(st.session_state.user_question)
+            # st.chat_message("ai").write(llm_response)
+            st.session_state.user_question = ""
 
     if chat_history.messages != []:
         with chat_container:

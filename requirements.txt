@@ -8,3 +8,4 @@ pypdfium2
 librosa
 pyyaml
 chromadb
+pydub
