@@ -19,7 +19,11 @@ def create_llm(model_path = config["model_path"]["small"], model_type = config["
     return llm
 
 def create_embeddings(embeddings = config["embeddings"]):
-    return HuggingFaceInstructEmbeddings(model_name = embeddings["model_name"], model_kwargs=embeddings["model_kwargs"], encode_kwargs = embeddings["encode_kwargs"])
+    return HuggingFaceInstructEmbeddings(
+        model_name = embeddings["model_name"], 
+        model_kwargs= embeddings["model_kwargs"], 
+        encode_kwargs = embeddings["encode_kwargs"]
+    )
 
 def create_chat_memory(chat_history):
     return ConversationBufferWindowMemory(memory_key="history", chat_memory=chat_history, k = 3)
