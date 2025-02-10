@@ -2,5 +2,11 @@
 venv/
 secrets.toml
 __pycache__/
-models/
-chat_sessions/../
+
+models/llava/*
+!models/llava/.gitkeep
+
+models/*
+!models/ 
+!models/llava/
+!models/.gitkeep
