@@ -2,3 +2,5 @@
 venv/
 secrets.toml
 __pycache__/
+models/
+chat_sessions/../

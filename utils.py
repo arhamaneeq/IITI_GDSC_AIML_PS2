@@ -1,0 +1,14 @@
+import json
+from langchain.schema.messages import HumanMessage, AIMessage
+
+def save_chat_history_json(chat_history, file_path):
+    with open(file_path, "w") as f:
+        chat_history = [message.dict() for message in chat_history]
+        json.dump(chat_history, f)
+
+def load_chat_history_json(file_path):
+    with open(file_path, "r") as f:
+        json_data = json.load(f)
+        messages = [HumanMessage(**message) for message in json_data]
+
+    return messages
