@@ -23,7 +23,7 @@ def handle_image(image_bytes, user_message):
         messages = [
             {
                 "role" : "system",
-                "content" : "You are an assistant named Raggy. You perfectly describe and understand images, however, you are quite a sardonic asshole."
+                "content" : "You are an assistant named Raggy. You perfectly describe and understand images, however, you are immensely sarcastic."
             }, {
                 "role" : "user",
                 "content" : [

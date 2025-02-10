@@ -4,7 +4,14 @@ model_path:
 
 model_type: "mistral"
 
-embeddings_path: 
+embeddings:
+  model_name: "BAAI/bge-large-en-v1.5"
+  model_kwargs: {
+   "device" : "cpu",
+  }
+  encode_kwargs: {
+    "normalize_embeddings": True
+  }
 
 model_config: {
   'max_new_tokens': 512, 

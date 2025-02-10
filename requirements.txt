@@ -9,3 +9,6 @@ librosa
 pyyaml
 chromadb
 pydub
+llama-cpp-python
+llangchain-community
+torch

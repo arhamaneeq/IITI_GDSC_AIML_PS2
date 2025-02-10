@@ -8,6 +8,7 @@ from llms_chain import load_normal_chain
 from utils import save_chat_history_json, get_timestamp, load_chat_history_json
 from audio_handler import transcribe_audio
 from image_handler import handle_image
+from pdf_handler import add_docs_to_db
 
 # langchain stuff
 from langchain.memory import StreamlitChatMessageHistory
@@ -75,6 +76,8 @@ def main():
     st.sidebar.selectbox("Select a Chat Session", chat_sessions, key="session_key", on_change=track_index)
     # Image Upload
     uploaded_image = st.sidebar.file_uploader("Upload an image file: ", type=["jpg", "jpeg", "png"])
+    # PDF Upload
+    uploaded_pdf = st.sidebar.file_uploader("Upload a PDF file", accept_multiple_files=True, key="pdf_upload", type=["pdf"])
 
 
     if st.session_state.session_key != "new_session":
@@ -97,10 +100,13 @@ def main():
 
 
     # SEND DATA TO LLM
+    if (uploaded_pdf):
+        with st.spinner("Processing PDF"):
+            add_docs_to_db(uploaded_pdf)
     #print(voice_recording)
-    if voice_recording:
+    if (voice_recording):
         transcribed_audio = transcribe_audio(voice_recording["bytes"])
-        print(transcribed_audio)
+        #print(transcribed_audio)
         llm_chain.run(transcribed_audio)
 
     if (send_button or st.session_state.send_input):
