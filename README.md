@@ -8,6 +8,7 @@ Create an intelligent chatbot that integrates Retrieval-Augmented Generation (RA
 
 ## File Structure
 - `📂chat_sessions`
+    - `.gitignore`
 - `📂models`
     - `📂llava`
         - `.gitkeep`
@@ -15,6 +16,7 @@ Create an intelligent chatbot that integrates Retrieval-Augmented Generation (RA
 - `.gitignore`
 - `requirements.txt`
 - `README.md`
+- `config.yaml`
 - `raggy.py`
 - `raggy_v2.py`
 - `llms_chain.py`
@@ -24,8 +26,10 @@ Create an intelligent chatbot that integrates Retrieval-Augmented Generation (RA
 - `image_handler.py`
 - `pdf_handler.py`
 
+The main program here is `raggy_v2.py`, which mostly contains the frontend logic. All processing is relegated to other scripts. `llms_chain.py` handles logic for the chat itself, whereas `audio_handler.py`, `image_handler.py`, and `pdf_handler.py` are responsible for converting raw input data from streamlit into formats readble by `llms_chain.py`. `utils.py` handles logic for storage and loading of previous chats via JSON files in the `chat_sessions` folder. We also include a `config.yaml` file which includes information regarding the models used.
+
 ### Installation
-Set up a local virtual environment by navigating to the root folder and running
+Clone the repository and then set up a local virtual environment by navigating to the root folder and running
 ```bash
 python -m venv .venv
 ```
@@ -37,7 +41,7 @@ Use `pip` to install most dependencies
 ```bash
 pip install -r requirements.txt
 ```
-You will also need to install `ffmpeg` via `choco`
+You will also need to install `ffmpeg` via `choco`. Open Windows Powershell as an Administrator and run
 ```bash
 choco install ffmpeg -y
 ```

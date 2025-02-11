@@ -1,5 +1,4 @@
 from prompt_templates import memory_prompt_template
-
 from langchain.chains import LLMChain
 from langchain.chains.retrieval_qa.base import RetrievalQA
 from langchain.embeddings import HuggingFaceInstructEmbeddings
@@ -15,6 +14,7 @@ with open("config.yaml", "r") as f:
 
 print(config)
 
+# FUNCTION DEFINITIONS
 def create_llm(model_path = config["model_path"]["small"], model_type = config["model_type"], model_config = config["model_config"]):
     llm = CTransformers(model=model_path,model_type= model_type, config=model_config)
     return llm
@@ -22,8 +22,6 @@ def create_llm(model_path = config["model_path"]["small"], model_type = config["
 def create_embeddings(embeddings = config["embeddings"]):
     return HuggingFaceInstructEmbeddings(
         model_name = embeddings["model_name"], 
-        model_kwargs= embeddings["model_kwargs"], 
-        encode_kwargs = embeddings["encode_kwargs"]
     )
 
 def create_chat_memory(chat_history):
@@ -55,17 +53,7 @@ def load_vectordb(embeddings):
 def load_retrieval_chain(llm, memory, vector_db):
     return RetrievalQA.from_llm(llm=llm, memory=memory, retriever=vector_db.as_retriever())
 
-class pdfChatChain:
-    def __init__(self, chat_history, model_path = config["model_path"]["small"], model_type = config["model_type"]):
-        self.memory = create_chat_memory(chat_history)
-        self.vector_db = load_vectordb(create_embeddings())
-        llm = create_llm()
-        #chat_prompt = create_prompt_from_template(memory_prompt_template)
-        self.llm_chain = load_retrieval_chain(llm, self.memory, self.vector_db)
-
-    def run(self, user_input):
-        return self.llm_chain.run(question = user_input, history = self.memory.chat_memory.messages, stop="Human:")
-
+# CLASS DEFINITIONS
 class chatChain:
     def __init__(self, chat_history, model_path = config["model_path"]["small"], model_type = config["model_type"]):
         self.memory = create_chat_memory(chat_history)
@@ -76,3 +64,14 @@ class chatChain:
     def run(self, user_input, audio=False):
         response =  self.llm_chain.run(human_input = user_input, history = self.memory.chat_memory.messages, stop="Human:")
         return response
+    
+class pdfChatChain:
+    def __init__(self, chat_history, model_path = config["model_path"]["small"], model_type = config["model_type"]):
+        self.memory = create_chat_memory(chat_history)
+        self.vector_db = load_vectordb(create_embeddings())
+        llm = create_llm()
+        #chat_prompt = create_prompt_from_template(memory_prompt_template)
+        self.llm_chain = load_retrieval_chain(llm, self.memory, self.vector_db)
+
+    def run(self, user_input):
+        return self.llm_chain.run(question = user_input, history = self.memory.chat_memory.messages, stop="Human:")

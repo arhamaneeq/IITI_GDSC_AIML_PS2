@@ -27,7 +27,6 @@ with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 # EXTRACT OUT SOME STUFF
-
 def load_chain(chat_history):
     if st.session_state.pdf_chat:
         return load_pdf_chat_chain(chat_history)
@@ -90,16 +89,17 @@ def main():
     # PDF Upload
     uploaded_pdf = st.sidebar.file_uploader("Upload a PDF file", accept_multiple_files=True, key="pdf_upload", type=["pdf"], on_change=toggle_pdf_chat)
 
-
+    # Load Chat History
     if st.session_state.session_key != "new_session":
         st.session_state.history = load_chat_history_json(config["chat_history_path"] + st.session_state.session_key)
     else:
         st.session_state.history = []
 
-
+    ## INTERFACE FOR CHAT HISTORY
     chat_history = StreamlitChatMessageHistory(key="history")
     llm_chain = load_chain(chat_history)
 
+    ## INTERFACE FOR USER INPUT
     user_input = st.text_input("Ask Raggy anything!", key="user_input", on_change=set_send_input)
 
     voice_col, send_col = st.columns(2)
@@ -142,7 +142,7 @@ def main():
             # st.chat_message("ai").write(llm_response)
             st.session_state.user_question = ""
 
-    # RETRIEBE DATA FROM LLM & DISPLAY
+    # RETRIEVE DATA FROM LLM & DISPLAY
     if chat_history.messages != []:
         with chat_container:
             st.write("Chat History:")

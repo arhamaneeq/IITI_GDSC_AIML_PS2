@@ -7,11 +7,12 @@ from pydub import AudioSegment
 
 def convert_bytes_to_array(audio_bytes):
     try:
+        # Convert to bytes
         print(f"Received audio bytes: {len(audio_bytes)}")
         audio_bytes = io.BytesIO(audio_bytes)
-        audio_bytes.seek(0)  # Ensure reading from the beginning
+        audio_bytes.seek(0)
 
-        # Convert to WAV using pydub
+        # Convert to WAV
         audio = AudioSegment.from_file(audio_bytes)
         if audio is None:
             raise ValueError("pydub failed to convert audio")
@@ -26,6 +27,7 @@ def convert_bytes_to_array(audio_bytes):
         audio_array, sample_rate = librosa.load(wav_bytes, sr=16000)
         print(f"Sample Rate: {sample_rate}, Shape: {audio_array.shape}")
 
+        # Return as float32 array
         return np.array(audio_array, dtype=np.float32)
 
     except Exception as e:
@@ -33,8 +35,10 @@ def convert_bytes_to_array(audio_bytes):
         return None
 
 def transcribe_audio(audio_bytes):
+    # Check if GPU is available
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
+    # Load the model
     pipe = pipeline(
         task="automatic-speech-recognition",
         model="openai/whisper-small",

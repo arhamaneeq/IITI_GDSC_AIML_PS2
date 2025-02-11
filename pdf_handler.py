@@ -24,10 +24,10 @@ def get_document_chunks(text_list):
     return documents
 
 def add_docs_to_db(pdfs_bytes):
-    texts = get_pdf_text(pdfs_bytes)
-    documents = get_document_chunks(texts)
-    vector_db = load_vectordb(create_embeddings())
-    vector_db.add_documents(documents)
+    texts = get_pdf_text(pdfs_bytes)                # extract text from pdfs
+    documents = get_document_chunks(texts)          # split text into chunks and create documents
+    vector_db = load_vectordb(create_embeddings())  # load vector db
+    vector_db.add_documents(documents)              # add documents to vector db
 
 
 
